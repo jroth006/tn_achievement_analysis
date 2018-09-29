@@ -1,169 +1,36 @@
-### Scenario
-<p>You are a team of data journalists at a major online news organization. The news room staff has taken an interest in Tennessee, and has asked your team to develop a picture of Tennesseans and how they differ across (and within) counties, particularly in regard to socioeconomic factors like education and income.</p>
-<p>Your assignment is to learn more about whether educational factors are related to income for Tennesseans.</p>
+# TN Achievement Gap Analysis
 
-#### Steps
-  1. **Read, clean, and join the IRS, Education, and Zip Code data.**
-     - **Use tidyverse "verbs"** </br>
+### Inspiration
+Heading into this data question, I had an understanding of the correlation between socioeconomic background and educational performance, but wanted to explore the strength of the correlation in Tennessee.
 
-     **mutate()** adds new variables that are functions of existing variables </br>
-     **select()** picks variables based on their names. </br>
-     **filter()** picks cases based on their values. </br>
-     **summarize()** reduces multiple values down to a single summary. </br>
-     **arrange()** changes the ordering of the rows. </br>
+### Data Selection
+County-level academic data was provided by the TN Department of Education, while zip-code level tax data is publicly available. The data was able to be joined based on zip codes and counties, with some overlap when a zip code is shared across counties.
 
-     - **Use purrr when applicable** </br>
+### Data Cleaning
+The data was pretty clean, so there wasn't a lot of cleaning up to perform. That's a first!
 
+### Visualizations
+I created a [flexdashboard](https://rmarkdown.rstudio.com/flexdashboard/) to form a dashboard that hosted different pieces of information. I used [plotly](https://plot.ly/r/) for my graphs, which allowed for hover information. I also used arrows to highlight specific points on the graphs, which helped tell the story.
 
+### Storytelling
+I wanted my dashboard to be a single tab, which would prevent the dashboard from becoming too cluttered and force me to keep my information simple and direct.
 
-  ```
-    #map
-       map_chr(c(5, 4, 3, 2, 1), function(x){
-         c("one", "two", "three", "four", "five")[x]
-         })
-    [1] "five" "four" "three" "two" "one"
+I created a "Summary" tab in the top-left quadrant to provide some statistics and additional references. The bottom-left quadrant contains a map of TN with outlines for each county, which is color-coded based on the percent of Economically Disadvantaged students in the county.
 
-    map_lgl(c(1, 2, 3, 4, 5), function(x){
-      x > 3
-    })
-    [1] FALSE FALSE FALSE TRUE TRUE
+The two scatter plots on the right-hand side are the main visualizations that help illustrate my hypothesis. I compare the graduation rates and the economically disadvantaged rates, and highlight both the low and high performers. This helps drive the user to my intended analysis.
 
-    map_if(1:5, function(x){
-      x %% 2 == 0
-      },
-      function(y){
-      y^2
-      }) %>% unlist()
-    [1] 1 4 3 16 5
+## Packages Used
 
-    map_at(seq(100, 500, 100), c(1, 3, 5), function(x){
-      x - 10
-    }) %>% unlist()
-    [1] 90 200 290 400 490
+* **flexdashboard** for creating the dashboard.
+* **dplyr** for data manipulation.
+* **Plotly** for interactive data visualizations.
+* **ggplotly** for creating the interactive map of TN.
 
-    map2_chr(letters, 1:26, paste)
-     [1] "a 1" "b 2" "c 3" "d 4" "e 5" "f 6" "g 7" "h 8" "i 9" "j 10"
-    [11] "k 11" "l 12" "m 13" "n 14" "o 15" "p 16" "q 17" "r 18" "s 19" "t 20"
-    [21] "u 21" "v 22" "w 23" "x 24" "y 25" "z 26"
+## Project Screenshots
 
-    pmap_chr(list(
-      list(1, 2, 3),
-      list("one", "two", "three"),
-      list("uno", "dos", "tres")
-    ), paste)
-    [1] "1 one uno" "2 two dos" "3 three tres"
+### TN Achievement Gap Analysis Dashboard
+![Alt text](readmeimg/Dashboard.png "Interactive Dashboard")
 
-    # reduce
-
-    reduce(c(1, 3, 5, 7), function(x, y){
-      message("x is ", x)
-      message("y is ", y)
-      message("")
-      x + y
-    })
-    x is 1
-    y is 3
-
-    x is 4
-    y is 5
-
-    x is 9
-    y is 7
-
-    [1] 16
-
-    reduce(letters[1:4], function(x, y){
-      message("x is ", x)
-      message("y is ", y)
-      message("")
-      paste0(x, y)
-    })
-    x is a
-    y is b
-
-    x is ab
-    y is c
-
-    x is abc
-    y is d
-
-    [1] "abcd"
-
-    reduce_right(letters[1:4], function(x, y){
-      message("x is ", x)
-      message("y is ", y)
-      message("")
-      paste0(x, y)
-    })
-    x is d
-    y is c
-
-    x is dc
-    y is b
-
-    x is dcb
-    y is a
-
-    [1] "dcba"
-
-    # search
-
-    contains(letters, "a")
-    [1] TRUE
-    contains(letters, "A")
-    [1] FALSE
-
-    detect(20:40, function(x){
-      x > 22 && x %% 2 == 0
-    })
-    [1] 24
-
-    detect_index(20:40, function(x){
-      x > 22 && x %% 2 == 0
-    })
-    [1] 5
-
-    # filter
-
-    keep(1:20, function(x){
-      x %% 2 == 0
-    })
-     [1] 2 4 6 8 10 12 14 16 18 20
-
-    discard(1:20, function(x){
-      x %% 2 == 0
-    })
-     [1] 1 3 5 7 9 11 13 15 17 19
-
-    every(1:20, function(x){
-      x %% 2 == 0
-    })
-    [1] FALSE
-    some(1:20, function(x){
-      x %% 2 == 0
-    })
-    [1] TRUE
-
-    # compose()
-
-    n_unique <- compose(length, unique)
-    # The composition above is the same as:
-    # n_unique <- function(x){
-    # length(unique(x))
-    # }
-
-    rep(1:5, 1:5)
-     [1] 1 2 2 3 3 3 4 4 4 4 5 5 5 5 5
-
-    n_unique(rep(1:5, 1:5))
-    [1] 5
-    ```
-
-
-
-  2. **Do some exploratory data analysis.**
-    - Use ggplot2 for visualizations
-    - Use the cor() function to look for correlations
-    - Use comments throughout to articulate the thinking that has informed your choices
-
-  3. **Use your exploratory data analysis as the foundation to fit a linear regression model.**
+## Lessons Learned
+* **It's OK to be Obvious** - The analysis that I performed on this project wasn't ground-breaking, and I felt confident that I knew that my data would support existing thought, but I'm glad I still pursued it. Regardless of how many articles, websites, or podcasts that have previously covered the topic, I still learned a lot from exploring the data, and other people might respond to my dashboard more than they had with other mediums.
+* **Be Clear and Precise** - Don't expect the consumer to know what they should be doing. Draw their eyes to the parts of your dashboard that you think are important by sparingly using colors, size, or even arrows!
